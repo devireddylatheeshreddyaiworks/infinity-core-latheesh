@@ -104,11 +104,27 @@ def health():
 @app.route('/vault', methods=['GET'])
 def vault():
     try:
+        # --- FOUNDER SECURITY CHECK ---
+        import os
+        from flask import request
+        SECRET_KEY = os.environ.get("VAULT_KEY")
+        user_key = request.args.get('key')
+
+        if not SECRET_KEY:
+            return jsonify({"error": "VAULT_KEY not set in Render"}), 500
+
+        if user_key != SECRET_KEY:
+            return jsonify({
+                "access": "DENIED",
+                "message": "Only Founder DevireddyLatheeshReddy can access - Wrong or Missing Key"
+            }), 403
+        # --- END SECURITY CHECK ---
+
         return jsonify({
             "vault_name": "Founder Memory Vault",
             "founder": FOUNDER_VAULT,
-            "security": "Maximum Protection",
-            "access": f"Only {FOUNDER_NAME} can access",
+            "security": "Maximum Protection - Founder Only",
+            "access": f"Only {FOUNDER_NAME} can access - VERIFIED",
             "backups": GOLDEN_SAFES,
             "time": get_current_time()
         }), 200
